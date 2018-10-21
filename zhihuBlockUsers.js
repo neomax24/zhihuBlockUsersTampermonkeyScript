@@ -2,7 +2,7 @@
 // fork from https://greasyfork.org/zh-CN/scripts/23197-知乎-隐藏你屏蔽的人补完
 // @name         zhihuBlockUsers
 // @namespace    http://tampermonkey.net/
-// @version      0.185
+// @version      0.186
 // @description  try to take over the world!
 // @author       neo_max24
 // @match        https://www.zhihu.com/*
@@ -20,7 +20,7 @@ localStorage.blockUserList.split(',').forEach(function (e) {
 function PickingBlockUser()
 {
 
-  console.log('auto expand block edited botton')
+  //console.log('auto expand block edited botton')
   var editedBottons=document.getElementsByClassName("Button ExpandableField-edit Button--link");
   for (var i=0; i< editedBottons.length; i++)
   {
@@ -34,9 +34,9 @@ function PickingBlockUser()
   // console.log(blockUserPageFooter);
   var numberOfBlockUserStr=blockUserPageFooter.innerText;
   var numberOfBlockUser=parseInt(numberOfBlockUserStr.replace(/[^0-9]/ig,""));
-  console.log('numberOfBlockUser is '+numberOfBlockUser);
+  //console.log('numberOfBlockUser is '+numberOfBlockUser);
   var numberOfBlockUserPage=Math.ceil(numberOfBlockUser/numberOfUserPerBlockPage);
-  console.log('numberOfBlockUserPage is '+numberOfBlockUserPage);
+  //console.log('numberOfBlockUserPage is '+numberOfBlockUserPage);
 
 
 
@@ -44,17 +44,17 @@ function PickingBlockUser()
   var userPageI=0
   var timer=null
   timer = setInterval(function(){
-          console.log(userPageI,numberOfBlockUserPage);
+          //console.log(userPageI,numberOfBlockUserPage);
           if (userPageI>numberOfBlockUserPage-1)
           {
               localStorage.blockUserList=allBlockUserList;
               // debug
-              console.log(allBlockUserList);
-              console.log(localStorage.blockUserList);
+              // console.log(allBlockUserList);
+              // console.log(localStorage.blockUserList);
                 for (var i=0; i< editedBottons.length; i++)
-  {
-      editedBottons[i].click();
-  }
+                {
+                    editedBottons[i].click();
+                }
               confirm('读取完成');
               clearInterval(timer);
           }
