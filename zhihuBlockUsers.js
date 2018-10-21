@@ -2,7 +2,7 @@
 // fork from https://greasyfork.org/zh-CN/scripts/23197-知乎-隐藏你屏蔽的人补完
 // @name         zhihuBlockUsers
 // @namespace    http://tampermonkey.net/
-// @version      0.18
+// @version      0.185
 // @description  try to take over the world!
 // @author       neo_max24
 // @match        https://www.zhihu.com/*
@@ -73,7 +73,7 @@ function PickingBlockUser()
 }
 
 $(function() {
-    console.log('### start of my user script ###');
+    //console.log('### start of my user script ###');
     if (window.location.href == 'https://www.zhihu.com/settings/filter'&&localStorage.blockUserList == undefined) {
 		PickingBlockUser();
 	}
@@ -83,7 +83,9 @@ $(function() {
 				window.location.href = 'https://www.zhihu.com/settings/filter';
 			}
 		}
-	} else {console.log(localStorage.blockUserList);}
+	} else {
+    //    console.log(localStorage.blockUserList);
+    }
 });
 
 function addBlockedUserRefreshButton(jNode)
@@ -111,7 +113,7 @@ function addBlockedUserRefreshButton(jNode)
        hNode.append(divNode);
 
        //$('#blockedUserRefreshButton').on('click',PickingBlockUser());
-       console.log($(buttonNode));
+       //console.log($(buttonNode));
     }
 }
 
@@ -150,7 +152,7 @@ function queryWithXPath(path,node){
 }
 
 function checkAndBlock(username,blockMsg,jNode) {
-    if( blockUserList[username] )
+    if(blockUserList[username] )
         replaceContentWithText(jNode,blockMsg);
 }
 
@@ -170,12 +172,15 @@ function processAnswer (jNode) {
     aNode = queryWithXPath(".//a[contains(@class,'UserLink-link')]",iNode);
     if(aNode)
     {
+        //console.log(aNode);
         var authorData=JSON.parse(iNode.getElementsByClassName("AnswerItem")[0].getAttribute('data-zop'));
         var authorName=authorData.authorName;
         checkAndBlock(aNode.href.split('/').pop(),'这里有一条已被屏蔽的 '+authorName+' 的回答',jNode);
     }
 }
 waitForKeyElements ("div.AnswerCard", processAnswer);
+waitForKeyElements ("div.List-item", processAnswer);
+
 
 //屏蔽时间线 new? no test 无法进入新版知乎发现
 function processFeed (jNode) {
