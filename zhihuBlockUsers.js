@@ -2,7 +2,7 @@
 // fork from https://greasyfork.org/zh-CN/scripts/23197-知乎-隐藏你屏蔽的人补完
 // @name         zhihuBlockUsers
 // @namespace    http://tampermonkey.net/
-// @version      0.186
+// @version      0.187
 // @description  try to take over the world!
 // @author       neo_max24
 // @match        https://www.zhihu.com/*
@@ -24,7 +24,11 @@ function PickingBlockUser()
   var editedBottons=document.getElementsByClassName("Button ExpandableField-edit Button--link");
   for (var i=0; i< editedBottons.length; i++)
   {
-      editedBottons[i].click();
+      if (editedBottons[i].innerText=="编辑")
+      {
+          //console.log(editedBottons[i].innerText);
+          editedBottons[i].click();
+      }
   }
 
   // block user
@@ -134,7 +138,7 @@ function replaceContentWithText(node, text) {
     spanNode.style.display="block";
     spanNode.style.lineHeight='4.0';
     spanNode.style.textAlign='center';
-    console.log(typeof(spanNode));
+    //console.log(typeof(spanNode));
     //spanNode.style.color = "#999";
     node.append(spanNode);
 }
