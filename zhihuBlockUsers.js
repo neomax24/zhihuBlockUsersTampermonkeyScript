@@ -1,9 +1,9 @@
 // ==UserScript==
 // fork from https://greasyfork.org/zh-CN/scripts/23197-知乎-隐藏你屏蔽的人补完
 // @name         zhihuBlockUsers
-// @namespace    http://tampermonkey.net/
-// @version      0.187
-// @description  try to take over the world!
+// @namespace    https://greasyfork.org/en/scripts/373444
+// @version      0.19
+// @description  block user in zhihu.
 // @author       neo_max24
 // @match        https://www.zhihu.com/*
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js
@@ -17,16 +17,18 @@ var blockUserList={};
 localStorage.blockUserList.split(',').forEach(function (e) {
     blockUserList[e] = true;
 });
-function PickingBlockUser()
+function PickingBlockUser(hNode)
 {
 
-  //console.log('auto expand block edited botton')
-  var editedBottons=document.getElementsByClassName("Button ExpandableField-edit Button--link");
+  console.log('auto expand block edited botton');
+  console.log(hNode);
+  var editedBottons=hNode.getElementsByClassName("Button Button--link Button--withLabel");
+  console.log(editedBottons);
   for (var i=0; i< editedBottons.length; i++)
   {
       if (editedBottons[i].innerText=="编辑")
       {
-          //console.log(editedBottons[i].innerText);
+          //console.log(editedBottons[i]);
           editedBottons[i].click();
       }
   }
@@ -35,7 +37,8 @@ function PickingBlockUser()
   var blockUserPage=document.getElementsByClassName("UserPage")[0];
   var blockUserPageFooter=blockUserPage.getElementsByTagName('footer')[0];
   // for debug
-  // console.log(blockUserPageFooter);
+  //console.log(blockUserPageFooter);
+
   var numberOfBlockUserStr=blockUserPageFooter.innerText;
   var numberOfBlockUser=parseInt(numberOfBlockUserStr.replace(/[^0-9]/ig,""));
   //console.log('numberOfBlockUser is '+numberOfBlockUser);
@@ -96,20 +99,29 @@ function addBlockedUserRefreshButton(jNode)
 {
     if (window.location.href == 'https://www.zhihu.com/settings/filter')
     {
-       var hElement=document.getElementsByClassName("SettingsTitle-title")[0];
+       var hElement=document.getElementsByClassName("SettingsMain")[0].getElementsByTagName("h3");
        var hNode=$(hElement);
+       for (var i=0;i<hElement.length;i++)
+       {
+           if(hElement[i].innerText="用户黑名单")
+           {
+               hNode=hElement[i].parentElement.parentElement.parentElement;
+               break;
+           }
+       }
+       //console.log($(hNode));
        var buttonNode=document.createElement('button');
        var divNode=document.createElement('div');
        buttonNode.append(document.createTextNode('获取屏蔽列表'));
        buttonNode.type="button";
        buttonNode.id='blockedUserRefreshButton';
        //buttonNode.setAttribute("onclick","PickingBlockUser()");
-       $(buttonNode).bind("click",function(){PickingBlockUser()});
+       $(buttonNode).bind("click",function(){PickingBlockUser(hNode)});
        //buttonNode.onclick='PickingBlockUser()';
        divNode.append(buttonNode);
        divNode.style.display="inline-block";
        divNode.style.position='relative';
-       divNode.style.right='-75%';
+       divNode.style.right='-80%';
        divNode.style.fontStyle='normal';
        divNode.style.fontWeight='normal';
        divNode.style.color='#0084ff';
@@ -121,7 +133,7 @@ function addBlockedUserRefreshButton(jNode)
     }
 }
 
-waitForKeyElements('div.SettingsTitle',addBlockedUserRefreshButton);
+waitForKeyElements('div.SettingsMain',addBlockedUserRefreshButton);
 
 
 function replaceContentWithText(node, text) {
@@ -170,21 +182,35 @@ function processComment (jNode) {
 waitForKeyElements ("div.CommentItem", processComment);
 
 
-//屏蔽回答
+//屏蔽回答和文章/
 function processAnswer (jNode) {
     iNode=jNode[0];
     aNode = queryWithXPath(".//a[contains(@class,'UserLink-link')]",iNode);
     if(aNode)
     {
-        //console.log(aNode);
-        var authorData=JSON.parse(iNode.getElementsByClassName("AnswerItem")[0].getAttribute('data-zop'));
+        //console.log(iNode);
+        var temp=iNode.getElementsByClassName("ArticleItem")[0];
+        if(temp)
+        {
+        var authorData=JSON.parse(temp.getAttribute('data-zop'));
         var authorName=authorData.authorName;
-        checkAndBlock(aNode.href.split('/').pop(),'这里有一条已被屏蔽的 '+authorName+' 的回答',jNode);
+        checkAndBlock(aNode.href.split('/').pop(),'这里有一条已被屏蔽的 '+authorName+' 的文章',jNode);
+        }
+        else
+        {
+            temp=iNode.getElementsByClassName("AnswerItem")[0];
+            if(temp)
+            {
+                console.log(temp);
+                authorData=JSON.parse(temp.getAttribute('data-zop'));
+                authorName=authorData.authorName;
+                checkAndBlock(aNode.href.split('/').pop(),'这里有一条已被屏蔽的 '+authorName+' 的回答',jNode);
+            }
+        }
     }
 }
 waitForKeyElements ("div.AnswerCard", processAnswer);
 waitForKeyElements ("div.List-item", processAnswer);
-
 
 //屏蔽时间线 new? no test 无法进入新版知乎发现
 function processFeed (jNode) {
