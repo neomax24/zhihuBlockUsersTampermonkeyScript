@@ -14,3 +14,5 @@ https://www.zhihu.com/settings/filter
 
 ## Github repository
 https://github.com/neomax24/zhihuBlockUsersTampermonkeyScript
+
+Fork from https://greasyfork.org/zh-CN/scripts/23197-知乎-隐藏你屏蔽的人补完
