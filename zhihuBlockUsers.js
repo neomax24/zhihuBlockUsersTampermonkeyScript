@@ -2,7 +2,7 @@
 // fork from https://greasyfork.org/zh-CN/scripts/23197-知乎-隐藏你屏蔽的人补完
 // @name         zhihuBlockUsers
 // @namespace    https://greasyfork.org/en/scripts/373444
-// @version      0.19
+// @version      0.191
 // @description  block user in zhihu.
 // @author       neo_max24
 // @match        https://www.zhihu.com/*
@@ -14,16 +14,19 @@
 var numberOfUserPerBlockPage=6
 
 var blockUserList={};
-localStorage.blockUserList.split(',').forEach(function (e) {
-    blockUserList[e] = true;
-});
+if(localStorage.blockUserList != undefined)
+{
+    localStorage.blockUserList.split(',').forEach(function (e) {
+        blockUserList[e] = true;
+    });
+}
 function PickingBlockUser(hNode)
 {
 
-  console.log('auto expand block edited botton');
-  console.log(hNode);
+  //console.log('auto expand block edited botton');
+  //console.log(hNode);
   var editedBottons=hNode.getElementsByClassName("Button Button--link Button--withLabel");
-  console.log(editedBottons);
+  //console.log(editedBottons);
   for (var i=0; i< editedBottons.length; i++)
   {
       if (editedBottons[i].innerText=="编辑")
@@ -82,7 +85,18 @@ function PickingBlockUser(hNode)
 $(function() {
     //console.log('### start of my user script ###');
     if (window.location.href == 'https://www.zhihu.com/settings/filter'&&localStorage.blockUserList == undefined) {
-		PickingBlockUser();
+       var hElement=document.getElementsByClassName("SettingsMain")[0].getElementsByTagName("h3");
+       var hNode=$(hElement);
+       //console.log('first setup');
+       for (var i=0;i<hElement.length;i++)
+       {
+           if(hElement[i].innerText="用户黑名单")
+           {
+               hNode=hElement[i].parentElement.parentElement.parentElement;
+               break;
+           }
+       }
+		PickingBlockUser(hNode);
 	}
 	if (localStorage.blockUserList == undefined) {
 		if (window.location.href != 'https://www.zhihu.com/settings/filter') {
@@ -162,7 +176,7 @@ function queryWithXPath(path,node){
         resultNode = queryResult.iterateNext();
     }
     catch(e){
-        console.log("tell me! why here has fucking problem?"+e)
+        //console.log("tell me! why here has fucking problem?"+e)
     }
     return resultNode;
 }
@@ -201,7 +215,7 @@ function processAnswer (jNode) {
             temp=iNode.getElementsByClassName("AnswerItem")[0];
             if(temp)
             {
-                console.log(temp);
+                //console.log(temp);
                 authorData=JSON.parse(temp.getAttribute('data-zop'));
                 authorName=authorData.authorName;
                 checkAndBlock(aNode.href.split('/').pop(),'这里有一条已被屏蔽的 '+authorName+' 的回答',jNode);
